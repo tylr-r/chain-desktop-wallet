@@ -11,6 +11,8 @@ import { SettingsDataUpdate } from '../../models/Wallet';
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
+
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const layout = {
@@ -107,16 +109,26 @@ const FormSettings = () => {
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
   const history = useHistory();
+  let networkFee = parseInt(FIXED_DEFAULT_FEE, 10);
+  let gasLimit = parseInt(FIXED_DEFAULT_GAS_LIMIT, 10);
 
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
+
+      if (defaultSettings.fee !== undefined && defaultSettings.fee.networkFee !== undefined) {
+        networkFee = parseInt(defaultSettings.fee.networkFee, 10);
+      }
+      if (defaultSettings.fee !== undefined && defaultSettings.fee.gasLimit !== undefined) {
+        gasLimit = parseInt(defaultSettings.fee.gasLimit, 10);
+      }
+
       form.setFieldsValue({
         nodeUrl: defaultSettings.nodeUrl,
         chainId: defaultSettings.network.chainId,
         indexingUrl: defaultSettings.indexingUrl,
-        networkFee: defaultSettings.fee.networkFee,
-        gasLimit: defaultSettings.fee.gasLimit,
+        networkFee,
+        gasLimit,
       });
     }
   }, [form, defaultSettings]);
